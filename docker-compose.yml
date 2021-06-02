@@ -1,0 +1,67 @@
+version: "3.2"
+services:
+  db_pg:    
+    image: postgres:1.1
+    container_name: postgres0
+    restart: always
+    volumes:
+      - /var/lib/postgresql/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=trust
+    ports:
+      - 5432:5432
+    networks:
+      - network
+
+  redis:    
+    image: redis:1.0
+    container_name: redis0
+    restart: always
+    volumes:
+      - /var/lib/redis/data:/data
+    ports:
+      - 6379:6379
+    networks:
+      - network
+
+  web:
+    image: nginx:1.0
+    container_name: nginx0
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - network
+      
+  java:
+    image: java:1.1
+    container_name: java
+    restart: always
+#    environment:
+#      - "JAVA_OPTS=-Xms512m -Xmx2g"
+    ports:
+      - 10004:10004
+    networks:
+      - network
+    depends_on:
+      - web
+      - db_pg
+      - redis
+    
+networks:
+   network:
+     driver: bridge
+
+#双进程配置
+#  db_pg2:
+#    image: postgres:1.0
+#    container_name: postgres1
+#    restart: always
+#    volumes:
+#      - /var/lib/postgresql/data1:/var/lib/postgresql/data
+#    environment:
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=postgres
+#    ports:
+#      - 5433:5432
